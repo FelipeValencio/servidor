@@ -19,7 +19,7 @@ public class ServidorService {
 		return ServidorApplication.usuarios;
 	}
 
-	public Usuario cadastrarUsuario(String nome_novo) {
+	public void cadastrarUsuario(String nome_novo) {
 
 		Usuario novo_us = new Usuario(nome_novo);
 
@@ -27,15 +27,13 @@ public class ServidorService {
 			if(u.getNome().equals(novo_us.getNome())) {
 				String mensagem = "Usuario " + novo_us.getNome() + " ja cadastrado, abortando!";
 				System.out.println("Servidor: " + mensagem);
-				return null; //Usuario ja cadastrado
+				return; //Usuario ja cadastrado
 			}
 		}
 
 		ServidorApplication.usuarios.add(novo_us);
 
 		System.out.println("Servidor: Usuario " + novo_us.getNome() + " cadastrado!");
-
-		return novo_us;
 	}
 	
 	public void cadastrarCompromisso(Compromisso novo_compromisso) {
@@ -121,12 +119,14 @@ public class ServidorService {
 		
 	}
 	
-	public List<Compromisso> consultarCompromissos(LocalDateTime data, Usuario usuario)  {
+	public List<Compromisso> consultarCompromissos(LocalDateTime data, String nome)  {
 		
 		List<Compromisso> compromissos = new ArrayList<Compromisso>();
 
+		Usuario usuario = getUsuario(nome);
+
 		for(Compromisso c : ServidorApplication.compromissos) {
-			if(estaNoCompromisso(c, usuario) && compararDatas(data, c.getDataHorario())) {
+			if(estaNoCompromisso(c, nome) && compararDatas(data, c.getDataHorario())) {
 				compromissos.add(c);
 			}
 		}
@@ -183,13 +183,13 @@ public class ServidorService {
 		
 	}
 	
-	private boolean estaNoCompromisso(Compromisso com, Usuario usuario) {
+	private boolean estaNoCompromisso(Compromisso com, String usuario) {
 		
 		if(com.getConvidados() != null) {
-			return (com.getDono().equals(usuario.getNome()) || com.getConvidados().contains(usuario.getNome()));
+			return (com.getDono().equals(usuario) || com.getConvidados().contains(usuario));
 		}
 		
-		return com.getDono().equals(usuario.getNome());
+		return com.getDono().equals(usuario);
 	}
 
 }

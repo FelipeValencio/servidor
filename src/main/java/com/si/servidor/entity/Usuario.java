@@ -12,6 +12,8 @@ public class Usuario {
 
 	private String nome;
 	private SseEmitter sseEmitter;
+
+	private int lastEventID = 0;
 	
 	public Usuario(String nome) {
 		this.nome = nome;
@@ -36,10 +38,13 @@ public class Usuario {
 
 	public void notificar(String mensagem) {
 		SseEmitter.SseEventBuilder event = SseEmitter.event()
-				.data(mensagem);
+				//.data(mensagem)
+				.id(String.valueOf(lastEventID))
+				.name(mensagem);
 
 		try {
 			this.sseEmitter.send(event);
+			lastEventID++;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

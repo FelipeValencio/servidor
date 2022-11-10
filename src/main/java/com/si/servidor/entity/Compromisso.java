@@ -1,5 +1,6 @@
 package com.si.servidor.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.si.servidor.ServidorApplication;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class Compromisso {
 	private LocalDateTime dataHorario;
 	
 	private List<String> convidados;
-	
+	@JsonIgnore
 	private ScheduledExecutorService ses;
 	
 	private static final Integer TEMPO_AVISO = 5;
@@ -57,7 +58,15 @@ public class Compromisso {
 	public void setNomeCompromisso(String nomeCompromisso) {
 		this.nomeCompromisso = nomeCompromisso;
 	}
-	
+
+	public ScheduledExecutorService getSes() {
+		return ses;
+	}
+
+	public void setSes(ScheduledExecutorService ses) {
+		this.ses = ses;
+	}
+
 	public void setTimer() {
 		final LocalDateTime now = LocalDateTime.now();
 		
@@ -67,8 +76,8 @@ public class Compromisso {
 		
 		final LocalDateTime tempoParaNotificar = this.dataHorario.minusMinutes(TEMPO_AVISO);
 		
-		ses = Executors.newScheduledThreadPool(1);
-		ses.schedule(this::enviaNotificacao,
+		this.ses = Executors.newScheduledThreadPool(1);
+		this.ses.schedule(this::enviaNotificacao,
 			 now.until(tempoParaNotificar, ChronoUnit.MILLIS),
 			 TimeUnit.MILLISECONDS);
 	}
@@ -87,7 +96,7 @@ public class Compromisso {
 	}
 	
 	public void excluiCompromisso() {
-		ses.shutdownNow();
+		this.ses.shutdownNow();
 	}
 	
 	private Usuario getConvidado(String nomeConvi) {

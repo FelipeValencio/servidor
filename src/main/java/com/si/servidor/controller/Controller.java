@@ -8,7 +8,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/api/calendario")
@@ -20,8 +23,8 @@ public class Controller {
     }
 
     @PostMapping(path = "/usuario/{nome}")
-    public Usuario cadastrarUsuario(@PathVariable("nome") String nome) {
-        return servidorService.cadastrarUsuario(nome);
+    public void cadastrarUsuario(@PathVariable("nome") String nome) {
+        servidorService.cadastrarUsuario(nome);
     }
 
     @GetMapping(path = "/usuario")
@@ -31,7 +34,6 @@ public class Controller {
     }
 
     @PostMapping(path = "/compromisso")
-    @ResponseBody
     public void cadastrarCompromisso(@RequestBody Compromisso compromisso) {
         servidorService.cadastrarCompromisso(compromisso);
     }
@@ -46,10 +48,10 @@ public class Controller {
         servidorService.removerConvidado(nomeCompromisso, nome);
     }
 
-    @GetMapping(path = "/compromisso")
-    public List<Compromisso> consultarCompromissos(@RequestParam("data") String data, @RequestBody Usuario usuario) {
+    @GetMapping(path = "/compromisso/{nome}")
+    public List<Compromisso> consultarCompromissos(@RequestParam("data") String data, @PathVariable("nome") String nome) {
         String result = java.net.URLDecoder.decode(data, StandardCharsets.UTF_8);
-        return servidorService.consultarCompromissos(LocalDateTime.parse(result), usuario);
+        return servidorService.consultarCompromissos(LocalDateTime.parse(result), nome);
     }
 
     @GetMapping(path = "/notificar/{nome}")
